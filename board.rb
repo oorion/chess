@@ -3,56 +3,40 @@ require_relative 'king'
 require_relative 'piece'
 
 class Board
-  attr_reader :board
+  attr_reader :board_pieces
 
   def initialize
-    @board = place_pieces(create_board)
+    place_pieces
   end
-
-  def create_board
-    initial_board = []
-    8.times do |i|
-      column = []
-      8.times do |j|
-        column << []
-      end
-      initial_board << column
-    end
-    initial_board
-  end
-
 
   #Should the board or the piece store the location information?
-  def place_pieces(board)
-    (0..7).each do |i|
-        board[1][i] = Pawn.new('black', 1, i)
-        board[6][i] = Pawn.new('white', 6, i)
+  def place_pieces
+    @board_pieces = (0..7).flat_map do |i|
+        [Pawn.new(:black, 1, i), Pawn.new(:white, 6, i)]
     end
-    board[0][4] = King.new('black', 0, 4)
-    board[7][4] = King.new('white', 7, 4)
-    board
-  end
-
-  def has_pieces?
-    true
+    board_pieces << King.new(:black, 0, 4)
+    board_pieces << King.new(:white, 7, 4)
   end
 
   def to_s
-    returned_board = ''
-    puts "\n"
-    board.each do |row|
-      row.each do |item|
-        if item.class.superclass == Piece
-          print item.to_s
-          returned_board << item.to_s
-        else
-          print "- "
-          returned_board << "- "
-        end
-      end
-      print "\n"
+    "\n" + raw_board + "\n"
+  end
+
+  def raw_board
+    (0..7).map do |i|
+      (0..7).map do |j|
+        item = find_item(i, j)
+        item.class.superclass == Piece ? item.to_s : "- "
+      end.join
+    end.join("\n")
+  end
+
+  def find_item(i, j)
+    board_pieces.find do |piece|
+      piece.row == i && piece.column == j
     end
-    puts "\n"
-    returned_board
   end
 end
+
+board = Board.new
+board.to_s
