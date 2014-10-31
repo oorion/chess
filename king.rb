@@ -1,7 +1,8 @@
 require_relative 'piece'
 
-class Pawn < Piece
+class King < Piece
+
   def to_s
-    'p '
+    'K '
   end
 end
